@@ -19,13 +19,13 @@ def controller(curr_temp: float, set_point: float) -> float:
 
 def main():
 
-    object = Plant_Box()
+    box = Plant_Box()
     set_point = 40#C
 
     # Main loop, do not change this
     while True:
-        object.set_control_power(controller(object.get_temp(), set_point))
-        object.update_temp()
+        box.set_control_power(controller(object.get_temp(), set_point))
+        box.update_temp()
         time.sleep(1)
 
 
