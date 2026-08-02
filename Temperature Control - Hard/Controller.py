@@ -24,7 +24,7 @@ def main():
 
     # Main loop, do not change this
     while True:
-        box.set_control_power(controller(object.get_temp(), set_point))
+        box.set_control_power(controller(box.get_temp(), set_point))
         box.update_temp()
         time.sleep(1)
 
