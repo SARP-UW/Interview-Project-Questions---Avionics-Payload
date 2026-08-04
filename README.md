@@ -7,6 +7,6 @@ There are two general types of projects, hardware and software.  Software projec
 We strongly advise **not** using AI for any of the work.  This is because during the interview, we will ask questions that change small but meaningful details about the project that will be exceptionally hard to answer if you did not go through the work yourself.  Using AI for these significantly reduces your chances of performing well in the interview.
 
 
-If you have any questions about the scope, problem statement, or implmentation expectations of the problem do not hesitate to email whoever invited you to the interview!  If for some reason you can not get in contact and it is limiting your ability to do the project, please email jbeard5@uw.edu (Joshua Beard, the avionics lead) or lverl23@uw.edu (Luke Verlangieri, the payload C&E lead), and one of us will get back to you.
+If you have any questions about the scope, problem statement, or implementation expectations of the problem do not hesitate to email whoever invited you to the interview!  If for some reason you can not get in contact and it is limiting your ability to do the project, please email jbeard5@uw.edu (Joshua Beard, the avionics lead) or lverl23@uw.edu (Luke Verlangieri, the payload C&E lead), and one of us will get back to you.
 
 Good Luck!
