@@ -18,7 +18,7 @@ CANNON_BALL_RADIUS = CANNON_BASE_RADIUS/2
 RENDER_EVERY_N_STEPS =  40
 #########################
 
-
+# This class Simulates a Cannon
 class CannonSimulator():
     
     def __init__(self,
@@ -115,24 +115,23 @@ class CannonSimulator():
         pad = TARGET_RADIUS * 4
         ax.set_xlim(-x_max - pad, x_max + pad)
         ax.set_ylim(-y_max - pad, y_max+ pad)
-        ax.set_aspect('equal', adjustable='box')  # avoid circles looking like ellipses
+        ax.set_aspect('equal', adjustable='box')
 
         cannon_base = Circle(self.cannon_pos, CANNON_BASE_RADIUS, color="brown")
         ax.add_patch(cannon_base)
         for pos in self.bucket_map:
             ax.text(*self.bucket_map[pos], pos, fontsize=TARGET_NUMBER_FONT_SIZE)
             target = Circle(self.bucket_map[pos], TARGET_RADIUS, color="red")
-            ax.add_patch(target)          # <-- also note: this was missing too!
+            ax.add_patch(target)     
             self.failed_targets[pos] = target
 
         return fig, ax
     
     def _tally_targets(self):
-        print("Targets hit")
+        print("\nTargets hit")
         for target in self.succeeded_targets:
             print(target, end=" ")
-        print("")
-        print("Targets missed")
+        print("\nTargets missed")
         for target in self.failed_targets:
             print(target, end=" ")
     
@@ -186,7 +185,7 @@ class CannonSimulator():
                 cannon_origin = (self.cannon_pos[0] - CANNON_WIDTH / 2, self.cannon_pos[1])
 
                 self.cannon_patch = Rectangle(cannon_origin, CANNON_WIDTH, CANNON_HEIGHT,
-                                            rotation_point=self.cannon_pos,   # pivot at bottom-center
+                                            rotation_point=self.cannon_pos, 
                                             angle= 270 + launch_angle,
                                             linewidth=2, edgecolor="black", facecolor="grey")
 
@@ -217,10 +216,10 @@ class CannonSimulator():
 
                 # Only touch the plot every N physics steps
                 if self.plot_trajectory and step_count % RENDER_EVERY_N_STEPS == 0:
-                    x.append(state['pos'][0])# type:ignore
-                    y.append(state['pos'][1])# type:ignore
-                    line.set_xdata(x)# type:ignore
-                    line.set_ydata(y)# type:ignore
+                    x.append(state['pos'][0]) # type:ignore
+                    y.append(state['pos'][1]) # type:ignore
+                    line.set_xdata(x) # type:ignore
+                    line.set_ydata(y) # type:ignore
 
                     if self.cannon_ball_patch:
                         self.cannon_ball_patch.remove()
@@ -231,11 +230,11 @@ class CannonSimulator():
 
                     plt.pause(self.dt * RENDER_EVERY_N_STEPS / self.pbm)
         
+        self._tally_targets()
+
+        print("Finished Simulation")
         
         if self.plot_trajectory:
             plt.ioff()
             plt.show()
             
-
-                
-        
