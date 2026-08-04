@@ -1,6 +1,6 @@
 
 
-BUCKET_MAP_A = {
+BUCKET_MAP_A: dict[str, tuple[float, float]] = {
     "1": (-11, -36),
     "2": (-43, 52),
     "3": (-36, 32),
@@ -12,9 +12,9 @@ BUCKET_MAP_A = {
     "9": (-32, 32),
 }
 
-CODE_A = "956783214"
+CODE_A: str = "956783214"
  
-BUCKET_MAP_B = {
+BUCKET_MAP_B: dict[str, tuple[float, float]] = {
     "1": (-59, 54),
     "2": (54, -40),
     "3": (59, 22),
@@ -26,9 +26,9 @@ BUCKET_MAP_B = {
     "9": (44, -74),
 }
 
-CODE_B = "123456789"
+CODE_B: str = "123456789"
  
-BUCKET_MAP_C = {
+BUCKET_MAP_C: dict[str, tuple[float, float]] = {
     "1": (69, -5),
     "2": (89, -64),
     "3": (-59, -9),
@@ -40,4 +40,4 @@ BUCKET_MAP_C = {
     "9": (65, -33),
 }
 
-CODE_C = "987654321"
+CODE_C: str = "987654321"
