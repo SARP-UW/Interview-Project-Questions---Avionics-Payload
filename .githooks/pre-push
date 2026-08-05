@@ -1,0 +1,17 @@
+﻿#!/bin/sh
+
+remote="$1"
+PROTECTED_REMOTE="public"
+PRIVATE_ITEMS="ADMIN/"
+
+if [ "$remote" = "$PROTECTED_REMOTE" ]; then
+    for item in $PRIVATE_ITEMS; do
+        if [ -e "$item" ]; then
+            echo "❌ ERROR: Push blocked! You cannot push to '$PROTECTED_REMOTE' while the '$item' folder exists in this workspace."
+            echo "Please temporarily move or remove the ADMIN/ folder before pushing to public."
+            exit 1
+        fi
+    done
+fi
+
+exit 0
