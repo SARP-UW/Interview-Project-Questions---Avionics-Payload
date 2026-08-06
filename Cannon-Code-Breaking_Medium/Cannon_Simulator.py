@@ -10,12 +10,12 @@ import time
 GRAVITY = -9.8 # m/s^2
 DT = 0.0001 #s 
 TARGET_RADIUS = 0.25 #m
-CANNON_WIDTH = 0.25 #m
-CANNON_HEIGHT = 0.5 #m
+CANNON_WIDTH = 0.75 #m
+CANNON_HEIGHT = 1.5 #m
 CANNON_BASE_RADIUS = CANNON_WIDTH/2 #m
-TARGET_NUMBER_FONT_SIZE = 6 
+TARGET_NUMBER_FONT_SIZE = 12
 CANNON_BALL_RADIUS = CANNON_BASE_RADIUS/2
-RENDER_EVERY_N_STEPS =  40
+RENDER_EVERY_N_STEPS =  100
 #########################
 
 # This class Simulates a Cannon
@@ -44,6 +44,7 @@ class CannonSimulator():
         # Start with blank cannon ball and cannon
         self.cannon_patch = None
         self.cannon_ball_patch = None
+        self.cannon_ball_visible =False
         
         # Target mapping
         self.failed_targets: dict[str, Circle] = {}
@@ -89,17 +90,16 @@ class CannonSimulator():
 
     # returns true if the ball is below the target and out of the target successful range
     def _missed_target(self,
-                       pos: tuple[float,float],
+                       state: dict[str, tuple[float, float]],
                        target: tuple[float, float],
                        target_radius: float
                        )-> bool:
-    
-        pos_x = pos[0]
-        pos_y = pos[1]
-        tar_x = target[0]
+        
+        vel_y = state['vel'][1]
+        pos_y = state['pos'][1]
         tar_y = target[1]
         
-        return (abs(pos_x) > abs(tar_x) + target_radius) and (pos_y < tar_y - target_radius)
+        return vel_y < 0 and pos_y < tar_y - target_radius
     
     # Creates the base graph that all targets will be overlayed on
     def _create_base_graph(self):
@@ -112,7 +112,7 @@ class CannonSimulator():
         x_max = max([abs(p[0]) for p in self.bucket_map.values()])
         y_max = max([abs(p[1]) for p in self.bucket_map.values()])
     
-        pad = TARGET_RADIUS * 4
+        pad = TARGET_RADIUS * 8
         ax.set_xlim(-x_max - pad, x_max + pad)
         ax.set_ylim(-y_max - pad, y_max+ pad)
         ax.set_aspect('equal', adjustable='box')
@@ -128,12 +128,28 @@ class CannonSimulator():
         return fig, ax
     
     def _tally_targets(self):
-        print("\nTargets hit")
-        for target in self.succeeded_targets:
-            print(target, end=" ")
-        print("\nTargets missed")
-        for target in self.failed_targets:
-            print(target, end=" ")
+        
+        if len(self.succeeded_targets) > 0:
+            print("\nTargets hit")
+            for target in self.succeeded_targets:
+                print(target, end=" ")
+                
+        print("")
+        
+        if len(self.failed_targets) > 0:
+            print("\nTargets missed")
+            for target in self.failed_targets:
+                print(target, end=" ")
+            
+            print("Mission Failed")
+        else:
+            print("Mission Accomplished!")
+                
+    def _distance_from_cannon(self, state):
+        pos_x = state['pos'][0]
+        pos_y = state['pos'][1]
+        return np.sqrt((pos_x - self.cannon_pos[0])**2 + (pos_y - self.cannon_pos[1]))
+        
     
     # Runs a full simulation given a code, expects the velocities and launch angles as a list of
     # [(velocity, launch angle (deg))]
@@ -165,7 +181,7 @@ class CannonSimulator():
             initial_velo = launch_conditions[i][0]
             launch_angle = launch_conditions[i][1]
             
-            print(f'Firing Shot Number {i+1}: vi = {initial_velo} m/s, angle = {launch_angle} deg')
+            print(f'Firing Shot Number {i+1}: vi = {initial_velo:.3f} m/s, angle = {launch_angle:.3f} deg')
             
             # initial state
             state = {
@@ -195,19 +211,26 @@ class CannonSimulator():
 
                 # Check break conditions
                 if self._hit_target(state['pos'], bucket_loc, self.target_radius):
-                    print(f"Target {i+1} hit!")
+                    print(f"Target {bucket_num} hit!")
                     if self.plot_trajectory:
                         self.failed_targets[bucket_num].remove()
                         del self.failed_targets[bucket_num]
-
+                        
+                        if self.cannon_ball_visible:
+                            self.cannon_ball_patch.remove() # type: ignore
+                            self.cannon_ball_patch = False
+    
                         green_target = Circle(self.bucket_map[bucket_num], self.target_radius, color="green")
                         ax.add_patch(green_target)# type:ignore
                         self.succeeded_targets[bucket_num] = green_target
 
                     break
 
-                if self._missed_target(state['pos'], bucket_loc, self.target_radius):
-                    print(f"Target {i+1} missed.")
+                if self._missed_target(state, bucket_loc, self.target_radius):
+                    print(f"Target {bucket_num} missed.")
+                    if self.cannon_ball_visible:
+                        self.cannon_ball_patch.remove() # type: ignore
+                        self.cannon_ball_patch = False
                     break
 
                 # Step forward in time
@@ -216,17 +239,22 @@ class CannonSimulator():
 
                 # Only touch the plot every N physics steps
                 if self.plot_trajectory and step_count % RENDER_EVERY_N_STEPS == 0:
-                    x.append(state['pos'][0]) # type:ignore
-                    y.append(state['pos'][1]) # type:ignore
-                    line.set_xdata(x) # type:ignore
-                    line.set_ydata(y) # type:ignore
-
-                    if self.cannon_ball_patch:
-                        self.cannon_ball_patch.remove()
-
-                    self.cannon_ball_patch = Circle(state['pos'], CANNON_BALL_RADIUS,
-                                                    facecolor="darkgrey", edgecolor="black", linewidth=2)
-                    ax.add_patch(self.cannon_ball_patch) # type:ignore
+                    
+                    if self._distance_from_cannon(state) > CANNON_HEIGHT:
+                        x.append(state['pos'][0]) # type:ignore
+                        y.append(state['pos'][1]) # type:ignore
+                        line.set_xdata(x) # type:ignore
+                        line.set_ydata(y) # type:ignore
+                        
+                        if self.cannon_ball_patch and self.cannon_ball_visible == True:
+                            self.cannon_ball_patch.remove() # type: ignore
+    
+                        self.cannon_ball_patch = Circle(state['pos'], CANNON_BALL_RADIUS,
+                                                        facecolor="darkgrey", edgecolor="black", linewidth=2)
+                        ax.add_patch(self.cannon_ball_patch) # type:ignore
+                        
+                        self.cannon_ball_visible = True
+                        
 
                     plt.pause(self.dt * RENDER_EVERY_N_STEPS / self.pbm)
         
