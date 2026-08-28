@@ -4,18 +4,23 @@
 
 def generate_data():
     data = []
+    steps = {1: 0}
 
     for i in range(1, 10000):
         x = i
-        count = 0
-        while x != 1:
+        path = []
+        while x not in steps:
+            path.append(x)
             if x % 2 == 0:
-                x /= 2
+                x //= 2
             else:
                 x = x * 3 + 1
-            count += 1
 
-        data.append(count)
+        count = steps[x]
+        for value in reversed(path):
+            count += 1
+            steps[value] = count
+        data.append(steps[i])
 
     return data
 
@@ -38,4 +43,3 @@ def main():
 if __name__ == "__main__":
     main()
         
-

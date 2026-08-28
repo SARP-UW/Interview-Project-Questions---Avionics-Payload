@@ -10,3 +10,18 @@ We strongly advise **not** using AI for any of the work.  This is because during
 If you have any questions about the scope, problem statement, or implementation expectations of the problem do not hesitate to email whoever invited you to the interview!  If for some reason you can not get in contact and it is limiting your ability to do the project, please email jbeard5@uw.edu (Joshua Beard, the avionics lead) or lverl23@uw.edu (Luke Verlangieri, the payload C&E lead), and one of us will get back to you.
 
 Good Luck!
+
+For C projects, first `cd` into the appropriate project directory, then compile
+the starter with:
+
+```sh
+gcc -std=c11 -Wall -Wextra -Wpedantic starter.c -o starter
+```
+
+Note you'll need `gcc` to do this.
+
+The C challenges are organized as follows:
+
+- Easy: sensor window statistics, packet checksum
+- Medium: telemetry packet decoder, command scheduler
+- Hard: telemetry ring buffer, launch sequence tracker
